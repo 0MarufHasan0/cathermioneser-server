@@ -85,8 +85,22 @@ app.get('/kindora/:id', async (req, res) => {{
 
 }})
 
+// uppdate korar jonno route
 
+app.patch('/kindora/:id', async (req, res) => {
+  const {id} = req.params;
+  const {email} = req.body;
+  const {updatedData} = req.body;
 
+  const query = {
+    _id: new ObjectId(id),
+    creatorEmail: email,
+  };
+
+  const result = await kindoraCollection.updateOne(query, 
+  { $set: updatedData });
+  res.json(result);
+});
 
 
 // delete korar jonno route
@@ -102,7 +116,7 @@ app.delete('/kindora/:id', async (req, res) => {
   const result = await kindoraCollection.deleteOne(query);
 
   console.log('Deleted result:', result);
-  res.send(result);
+  res.json(result);
 
 })
 
