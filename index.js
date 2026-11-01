@@ -55,14 +55,14 @@ export async function connectToMongoDB() {
 
     // URL theke category collect korbo
     
-    const category = req.query.category;
+    const { category } = req.query;
 
-     console.log("Category:", category);
+    //  console.log("Category:", category);
 
     // Category onujayi filter
     const query = category ? { eventType: category } : {};
 
-    console.log("Query:", query);
+    // console.log("Query:", query);
 
     // Database theke data anbo
     const result = await kindoraCollection.find(query).toArray();
@@ -84,6 +84,39 @@ app.get('/kindora/:id', async (req, res) => {{
   res.send(result);
 
 }})
+
+
+
+
+
+// delete korar jonno route
+
+app.delete('/kindora/:id', async (req, res) => {
+  const {id} = req.params;
+  const {email} = req.body;
+
+    const query = {
+    _id: new ObjectId(id),
+    creatorEmail: email,
+  };
+  const result = await kindoraCollection.deleteOne(query);
+
+  console.log('Deleted result:', result);
+  res.send(result);
+
+})
+
+
+// Event create korar track
+
+app.get('/my-kindora/:email', async (req, res) => {
+  const {email}= req.params
+  console.log('email : ', email)
+  const result = await kindoraCollection.find({creatorEmail: email}).toArray();
+  res.send(result)
+
+})
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
