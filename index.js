@@ -2,6 +2,7 @@ import express from "express"
 import 'dotenv/config'
 import cors from 'cors'
 import { MongoClient, ObjectId } from 'mongodb';
+import { createRemoteJWKSet , jwtVerify } from "jose";
 
 
 
@@ -30,6 +31,45 @@ export async function connectToMongoDB() {
 
  const db = mongodbConnect.db('Kindora')
  const kindoraCollection = db.collection('Kindora-collection')
+ const eventjoinCollection = db.collection('Event-join-collection')
+
+//  jwt verify korar jonno middleware
+
+ const verifyToken = async (req, res, next) => {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: "Unauthorized access" });
+  }
+
+  const token = authorization.split(" ")[1];
+  if (!token) {
+    return res.status(401).send({ error: true, message: "Unauthorized access" });
+  }
+
+  // token verify korar jonno jwt verify method use kora hobe
+
+
+  const JWKS = createRemoteJWKSet(
+      new URL('http://localhost:3000/api/auth/jwks')
+    )
+
+  try {
+
+    const { payload } = await jwtVerify(token, JWKS )
+     next();
+
+
+
+  } catch (error) {
+    return res.status(401).send({ error: true, message: "Invalid token" });
+  }
+
+
+
+ 
+
+ }
 
 
  app.post('/add-kindora' , async(req , res)=> {
@@ -76,7 +116,9 @@ export async function connectToMongoDB() {
 
 //  Signle route
 
-app.get('/kindora/:id', async (req, res) => {{
+app.get('/kindora/:id', 
+  verifyToken,
+  async (req, res) => {{
 
   const {id} = req.params;
   const query = {_id: new ObjectId(id)};
@@ -130,6 +172,38 @@ app.get('/my-kindora/:email', async (req, res) => {
   res.send(result)
 
 })
+
+// Event joining route
+app.post('/join-event', async (req, res) => {
+  const data = req.body;
+  console.log('Joining event data:', data);
+  const result = await eventjoinCollection.insertOne(data);
+  res.send(result);
+});
+
+app.get('/joined-event/:email', async (req, res) => {
+  const { email } = req.params;
+  console.log('Fetching joined events for email:', email);
+  const result = await eventjoinCollection.find({ joingEmail: email }).toArray();
+  res.send(result);
+});
+
+
+app.delete('/joined-event/:id', async (req, res) => {
+  const {id} = req.params;
+  const {email} = req.body;
+
+    const query = {
+    _id: new ObjectId(id),
+    joingEmail: email,
+  };
+  const result = await eventjoinCollection.deleteOne(query);
+
+  console.log('Deleted result:', result);
+  res.json(result);
+
+})
+
 
 
 app.get('/', (req, res) => {
