@@ -50,8 +50,12 @@ export async function connectToMongoDB() {
   // token verify korar jonno jwt verify method use kora hobe
 
 
+  // CLIENT_URI may be configured with a trailing slash; strip it so the
+  // JWKS URL never becomes "https://...//api/auth/jwks".
+  const clientUri = (process.env.CLIENT_URI || "http://localhost:3000").replace(/\/+$/, "")
+
   const JWKS = createRemoteJWKSet(
-      new URL('http://localhost:3000/api/auth/jwks')
+      new URL(`${clientUri}/api/auth/jwks`)
     )
 
   try {
@@ -269,3 +273,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+export default app
