@@ -126,11 +126,13 @@ The token is verified against `${CLIENT_URI}/api/auth/jwks`.
 | -------- | ---------------------- | :--: | -------------------------------------------------------- |
 | `POST`   | `/add-kindora`         |  🔒  | Create a new event.                                      |
 | `GET`    | `/add-kindora`         |  —   | Get all events.                                          |
-| `GET`    | `/events`              |  🔒  | Get events; supports `?category=` and `?limit=`.         |
+| `GET`    | `/events`              |  —   | Get events; supports `?category=` and `?limit=`.         |
 | `GET`    | `/kindora/:id`         |  🔒  | Get a single event by ID.                                |
 | `PATCH`  | `/kindora/:id`         |  🔒  | Update an event. Body: `{ "email": "...", "updatedData": { ... } }`. |
 | `DELETE` | `/kindora/:id`         |  🔒  | Delete an event. Body: `{ "email": "..." }`.             |
 | `GET`    | `/my-kindora/:email`   |  🔒  | Get all events created by a specific user.               |
+
+> `/events` is currently a public read endpoint. Every other event route marked 🔒 requires a valid bearer token.
 
 ### Event Participation
 
