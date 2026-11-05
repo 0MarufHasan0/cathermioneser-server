@@ -7,7 +7,7 @@ import { createRemoteJWKSet , jwtVerify } from "jose";
 
 
 const app = express();
-const port = 8000
+const port = process.env.PORT || 8000
 
 // Adds headers: Access-Control-Allow-Origin: *
  app.use(express.json())
@@ -128,7 +128,7 @@ verifyToken  ,
 
 app.get("/events", 
   
-  verifyToken,
+  // verifyToken,
   
   async (req, res) => {
   try {
